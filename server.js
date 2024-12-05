@@ -3,30 +3,40 @@ import morgan from 'morgan';
 import cors from 'cors';
 import { config } from 'dotenv';
 import router from './router/router.js';
+import connect from './database/conn.js';
 
-const app = express()
+const app = express();
 
-/** app middlewares */
-app.use(morgan('tiny'));
-app.use(cors());
-app.use(express.json());
+/** Load environment variables */
 config();
 
-/** application port */
-const port = process.env.PORT || 8080;
+/** App middlewares */
+app.use(morgan('tiny'));
+app.use(cors({
+  origin: 'http://localhost:3000', // Allow requests from client-side
+}));
+app.use(express.json());
 
+/** Application port */
+const port = process.env.PORT || 5000;
 
-/** routes */
-app.use('/api', router) /**api's */
+/** Routes */
+app.use('/api', router);
 
+/** Root endpoint */
 app.get('/', (req, res) => {
-    try{
-        res.json("Get Request")
-    }catch (error){
-        res.json(error)
-    }
-})
+  try {
+    res.json("Get Request");
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
 
-app.listen(port, () => {
-    console.log(`Server connected to http://localhost:${port}`)
-})
+/** Start server only when we have a valid connection */
+connect().then(() => {
+  app.listen(port, () => {
+    console.log(`Server connected to http://localhost:${port}`);
+  });
+}).catch(error => {
+  console.log("Invalid Database Connection:", error.message);
+});
