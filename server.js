@@ -13,7 +13,7 @@ config();
 /** App middlewares */
 app.use(morgan('tiny'));
 app.use(cors({
-  origin: 'http://localhost:3000', // Allow requests from client-side
+  origin: 'http://localhost:5000', // Allow requests from client-side
 }));
 app.use(express.json());
 
